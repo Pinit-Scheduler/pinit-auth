@@ -1,11 +1,11 @@
-package me.gg.pinit.authenticate.provider;
+package me.gg.pinit.infra;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 public class JwtTokenProvider {
-    private final PrivateKey privateKey;   // 서명용 (Auth 서버에서만 사용)
-    private final PublicKey publicKey;     // 검증용 (모든 서비스에서 사용)
+    private final PrivateKey privateKey;
+    private final PublicKey publicKey;
     private final String issuer;
     private final Duration accessTokenValidity;
     private final Duration refreshTokenValidity;
