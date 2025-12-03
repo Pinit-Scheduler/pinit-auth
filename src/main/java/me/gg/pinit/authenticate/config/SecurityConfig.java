@@ -28,16 +28,21 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/signup").permitAll()
+                        .requestMatchers("/login", "/signup", "/refresh").permitAll()
                         .anyRequest().authenticated()
                 );
 
         http.addFilterBefore(
-                new JwtAuthenticationFilter(authenticationManager),
+                jwtAuthenticationFilter(authenticationManager),
                 UsernamePasswordAuthenticationFilter.class
         );
 
         return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+        return new JwtAuthenticationFilter(authenticationManager);
     }
 
     @Bean
