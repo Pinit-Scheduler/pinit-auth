@@ -1,7 +1,6 @@
 package me.gg.pinit.authenticate.provider;
 
 import me.gg.pinit.authenticate.authentication.JwtAuthenticationToken;
-import me.gg.pinit.service.JwtTokenProvider;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -28,10 +27,10 @@ public class JwtAuthenticationProvider  implements AuthenticationProvider {
             throw new BadCredentialsException("Invalid token");
         }
 
-        String username = jwtTokenProvider.getUsername(token);
+        Long memberId = jwtTokenProvider.getMemberId(token);
         Collection<? extends GrantedAuthority> authorities = jwtTokenProvider.getAuthorities(token);
 
-        return new JwtAuthenticationToken(username, token, authorities);
+        return new JwtAuthenticationToken(memberId, token, authorities);
     }
 
     @Override
