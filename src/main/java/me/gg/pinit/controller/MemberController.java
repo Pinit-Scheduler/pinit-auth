@@ -1,5 +1,7 @@
 package me.gg.pinit.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import me.gg.pinit.controller.dto.LoginRequest;
 import me.gg.pinit.controller.dto.LoginResponse;
 import me.gg.pinit.controller.dto.SignupRequest;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @RestController
@@ -42,6 +45,33 @@ public class MemberController {
     public ResponseEntity<Void> signup(@RequestBody SignupRequest signupRequest) {
         memberService.signup(signupRequest.getUsername(), signupRequest.getPassword());
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String refreshToken = Arrays.stream(request.getCookies())
+                .filter(cookie -> "refresh_token".equals(cookie.getName()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse(null);
+
+        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Long memberId = jwtTokenProvider.getMemberId(refreshToken);
+
+        String newAccessToken = jwtTokenProvider.createAccessToken(memberId, Collections.emptyList());
+
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(memberId);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, getRefreshTokenCookie(newRefreshToken).toString())
+                .body(new LoginResponse(newAccessToken));
     }
 
     @GetMapping("/me")
