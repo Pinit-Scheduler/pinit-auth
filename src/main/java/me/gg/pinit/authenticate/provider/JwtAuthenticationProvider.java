@@ -1,6 +1,7 @@
 package me.gg.pinit.authenticate.provider;
 
 import me.gg.pinit.authenticate.authentication.JwtAuthenticationToken;
+import me.gg.pinit.infra.JwtTokenProvider;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -18,7 +19,7 @@ public class JwtAuthenticationProvider  implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        if(!(authentication instanceof JwtAuthenticationProvider)){
+        if(!(authentication instanceof JwtAuthenticationToken)){
             return null;
         }
 
