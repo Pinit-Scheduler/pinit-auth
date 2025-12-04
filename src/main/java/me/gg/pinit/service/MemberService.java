@@ -1,19 +1,16 @@
 package me.gg.pinit.service;
 
 import me.gg.pinit.domain.Member;
-import me.gg.pinit.infra.JwtTokenProvider;
-import me.gg.pinit.infra.MemberRepository;
+import me.gg.pinit.domain.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MemberService {
-    private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public MemberService(JwtTokenProvider jwtTokenProvider, MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
-        this.jwtTokenProvider = jwtTokenProvider;
+    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
     }

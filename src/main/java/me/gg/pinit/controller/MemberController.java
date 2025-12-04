@@ -2,11 +2,11 @@ package me.gg.pinit.controller;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import me.gg.pinit.adaptor.JwtTokenProvider;
 import me.gg.pinit.controller.dto.LoginRequest;
 import me.gg.pinit.controller.dto.LoginResponse;
 import me.gg.pinit.controller.dto.SignupRequest;
 import me.gg.pinit.domain.Member;
-import me.gg.pinit.infra.JwtTokenProvider;
 import me.gg.pinit.service.MemberService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
