@@ -1,4 +1,4 @@
-package me.gg.pinit.infra;
+package me.gg.pinit.adaptor;
 
 import me.gg.pinit.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;

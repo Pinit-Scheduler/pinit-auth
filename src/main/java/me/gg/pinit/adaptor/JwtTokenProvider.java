@@ -1,4 +1,4 @@
-package me.gg.pinit.infra;
+package me.gg.pinit.adaptor;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
