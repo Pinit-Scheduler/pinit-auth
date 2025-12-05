@@ -17,6 +17,7 @@ import me.gg.pinit.infra.JwtTokenProvider;
 import me.gg.pinit.service.Oauth2ProviderMapper;
 import me.gg.pinit.service.Oauth2Service;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Collections;
+import java.net.URI;
 
 @RestController
 @Tag(name = "소셜 로그인", description = "외부 OAuth2 공급자(네이버) 로그인 흐름")
@@ -91,20 +92,29 @@ public class Oauth2Controller {
             @ApiResponse(responseCode = "500", description = "state 검증 실패, 토큰 교환 실패 등 서버 오류")
     })
     public ResponseEntity<LoginResponse> socialLogin(@PathVariable String provider, @ModelAttribute SocialLoginResult socialLoginResult, HttpServletRequest request) {
+
         if (socialLoginResult.getError() != null) {
-            return ResponseEntity.badRequest().build();
+            URI errorUri = URI.create("https://pinit.go-gradually.me/login?error=social");
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(errorUri)
+                    .build();
         }
 
         HttpSession session = request.getSession(false);
         String sessionId = session != null ? session.getId() : null;
 
-        Member member = oauth2Service.login(provider, sessionId, socialLoginResult.getCode(), socialLoginResult.getState());
-        String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
-        String accessToken = jwtTokenProvider.createAccessToken(member.getId(), Collections.emptyList());
+        Member member = oauth2Service.login(provider, sessionId,
+                socialLoginResult.getCode(), socialLoginResult.getState());
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, getRefreshTokenCookie(refreshToken).toString())
-                .body(new LoginResponse(accessToken));
+        String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
+        ResponseCookie refreshCookie = getRefreshTokenCookie(refreshToken);
+
+        URI redirectUri = URI.create("https://pinit.go-gradually.me/");
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .location(redirectUri)
+                .build();
     }
 
     private ResponseCookie getRefreshTokenCookie(String refreshToken) {
