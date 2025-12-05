@@ -1,4 +1,4 @@
-package me.gg.pinit.infra;
+package me.gg.pinit.infra.config;
 
 import org.springframework.context.annotation.Configuration;
 
