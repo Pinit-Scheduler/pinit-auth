@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -17,6 +18,9 @@ public class Member {
     private String username;
     private String password;
 
+    @Setter
+    private boolean isSocialLogin = false;
+
     protected Member() {
     }
 
@@ -24,4 +28,5 @@ public class Member {
         this.username = username;
         this.password = password;
     }
+
 }
