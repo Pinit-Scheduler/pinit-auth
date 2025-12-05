@@ -16,6 +16,14 @@ public class OauthAccountId {
     @Column(name = "sub")
     private String sub;
 
+    protected OauthAccountId() {
+    }
+
+    public OauthAccountId(String issuerURI, String sub) {
+        this.issuerURI = issuerURI;
+        this.sub = sub;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
