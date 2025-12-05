@@ -19,7 +19,7 @@ public class Member {
     private String password;
 
     @Setter
-    private boolean isSocialLogin = false;
+    private boolean socialLogin = false;
 
     protected Member() {
     }
