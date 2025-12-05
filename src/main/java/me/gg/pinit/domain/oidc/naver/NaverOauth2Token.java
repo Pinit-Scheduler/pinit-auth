@@ -1,4 +1,4 @@
-package me.gg.pinit.domain.naver;
+package me.gg.pinit.domain.oidc.naver;
 
 import lombok.Getter;
 

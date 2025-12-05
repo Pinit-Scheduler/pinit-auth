@@ -1,4 +1,4 @@
-package me.gg.pinit.domain;
+package me.gg.pinit.domain.oidc;
 
 import lombok.Getter;
 
