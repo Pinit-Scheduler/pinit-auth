@@ -2,6 +2,7 @@ package me.gg.pinit.infra;
 
 import me.gg.pinit.domain.oidc.Oauth2Provider;
 import me.gg.pinit.service.Oauth2ProviderMapper;
+import me.gg.pinit.service.exception.ProviderNotFoundException;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -23,7 +24,7 @@ public class Oauth2ProviderMapperImpl implements Oauth2ProviderMapper {
     public Oauth2Provider get(String provider) {
         Oauth2Provider oauth2Provider = providerMap.get(provider);
         if (oauth2Provider == null) {
-            throw new IllegalArgumentException("지원하지 않는 provider 입니다. provider=" + provider);
+            throw new ProviderNotFoundException("지원하지 않는 provider 입니다. provider=" + provider);
         }
         return oauth2Provider;
     }
