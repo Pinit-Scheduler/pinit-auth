@@ -1,15 +1,22 @@
 package me.gg.pinit.domain.oidc;
 
-public class OpenIdPublishCommand extends OpenIdCommand {
-    private String code;
-    private String state;
+import lombok.Getter;
 
-    public OpenIdPublishCommand(String grant_type, String client_id, String client_secret) {
-        super(grant_type, client_id, client_secret);
+import java.util.List;
+
+@Getter
+public class OpenIdPublishCommand extends OpenIdCommand {
+    private final String code;
+    private final String state;
+
+    public OpenIdPublishCommand(String client_id, String client_secret, String code, String state) {
+        super("authorization_code", client_id, client_secret);
+        this.code = code;
+        this.state = state;
     }
 
     @Override
-    public void execute(Oauth2Provider provider) {
-
+    public List<Oauth2Token> execute(Oauth2Provider provider) {
+        return provider.grantToken(this);
     }
 }

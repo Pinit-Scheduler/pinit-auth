@@ -1,15 +1,22 @@
 package me.gg.pinit.domain.oidc;
 
-public class OpenIdRevokeCommand extends OpenIdCommand {
-    private String access_token;
-    private String service_provider;
+import lombok.Getter;
 
-    public OpenIdRevokeCommand(String grant_type, String client_id, String client_secret) {
-        super(grant_type, client_id, client_secret);
+import java.util.List;
+
+@Getter
+public class OpenIdRevokeCommand extends OpenIdCommand {
+    private final String access_token;
+    private final String service_provider;
+
+    public OpenIdRevokeCommand(String client_id, String client_secret, String access_token, String service_provider) {
+        super("delete", client_id, client_secret);
+        this.access_token = access_token;
+        this.service_provider = service_provider;
     }
 
     @Override
-    public void execute(Oauth2Provider provider) {
-
+    public List<Oauth2Token> execute(Oauth2Provider provider) {
+        return provider.grantToken(this);
     }
 }
