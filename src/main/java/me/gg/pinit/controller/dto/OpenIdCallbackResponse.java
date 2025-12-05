@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OpenICallbackResponse {
+public class OpenIdCallbackResponse {
     private String code;
     private String state;
     private String error;
