@@ -11,6 +11,7 @@ import me.gg.pinit.domain.oidc.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ public class Oauth2Service {
         return oauth2StateService.createAndStoreState(sessionId);
     }
 
-    public String getAuthorizationUri(String provider, String state) {
+    public URI getAuthorizationUri(String provider, String state) {
         Oauth2Provider oauth2Provider = oauth2ProviderMapper.get(provider);
         return oauth2Provider.getAuthorizationUrl();
     }
