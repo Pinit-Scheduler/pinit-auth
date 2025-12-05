@@ -1,7 +1,7 @@
 package me.gg.pinit.service;
 
-import me.gg.pinit.domain.Member;
-import me.gg.pinit.domain.MemberRepository;
+import me.gg.pinit.domain.member.Member;
+import me.gg.pinit.domain.member.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

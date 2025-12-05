@@ -1,4 +1,4 @@
-package me.gg.pinit.domain;
+package me.gg.pinit.domain.member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

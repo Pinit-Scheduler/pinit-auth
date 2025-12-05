@@ -1,4 +1,4 @@
-package me.gg.pinit.domain;
+package me.gg.pinit.domain.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
