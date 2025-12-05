@@ -9,7 +9,7 @@ public class OpenIdPublishCommand extends OpenIdCommand {
     }
 
     @Override
-    public void execute() {
+    public void execute(Oauth2Provider provider) {
 
     }
 }
