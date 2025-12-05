@@ -20,6 +20,8 @@ public class NaverOauth2Provider implements Oauth2Provider {
     public static final String NAVER_ID_URL = "https://nid.naver.com";
     public static final String NAVER_APP_URL = "https://openapi.naver.com";
     private static final String OAUTH_2_0_TOKEN = "/oauth2.0/token";
+    public static final String OPENID_PROFILE = "/v1/nid/me";
+    private static final String OAUTH_2_0_AUTHORIZE = "/oauth2.0/authorize";
     private final RestClient loginClient;
     private final RestClient profileClient;
     private final NaverRegistrationProperties naverRegistrationProperties;
@@ -32,6 +34,11 @@ public class NaverOauth2Provider implements Oauth2Provider {
                 .baseUrl(NAVER_APP_URL).defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
         this.naverRegistrationProperties = naverRegistrationProperties;
+    }
+
+    @Override
+    public String getAuthorizationUrl() {
+        return NAVER_ID_URL + OAUTH_2_0_AUTHORIZE;
     }
 
     @Override
@@ -53,7 +60,7 @@ public class NaverOauth2Provider implements Oauth2Provider {
         if (!accessToken.getRole().equals(Oauth2Token.Role.ACCESS_TOKEN))
             throw new IllegalArgumentException("AccessToken이 아닙니다.");
         OpenIdProfileResponse result = profileClient.get()
-                .uri("/v1/nid/me")
+                .uri(OPENID_PROFILE)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken.getToken())
                 .retrieve()
                 .body(OpenIdProfileResponse.class);

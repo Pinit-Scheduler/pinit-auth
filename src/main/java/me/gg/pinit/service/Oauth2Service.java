@@ -30,6 +30,15 @@ public class Oauth2Service {
 
     // Todo 리다이렉트 준비 로직 추가
 
+    public String generateState(String sessionId) {
+        return oauth2StateService.createAndStoreState(sessionId);
+    }
+
+    public String getAuthorizationUri(String provider, String state) {
+        Oauth2Provider oauth2Provider = oauth2ProviderMapper.get(provider);
+        return oauth2Provider.getAuthorizationUrl();
+    }
+
 
     @Transactional
     public Member login(String provider, String currentSessionId, String code, String state) {
