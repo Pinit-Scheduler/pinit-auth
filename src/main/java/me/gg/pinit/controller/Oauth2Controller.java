@@ -8,37 +8,48 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import me.gg.pinit.controller.dto.LoginResponse;
 import me.gg.pinit.controller.dto.OauthLoginSetting;
 import me.gg.pinit.controller.dto.SocialLoginResult;
 import me.gg.pinit.domain.member.Member;
 import me.gg.pinit.domain.oidc.Oauth2Provider;
 import me.gg.pinit.infra.JwtTokenProvider;
+import me.gg.pinit.infra.config.TokenCookieFactory;
 import me.gg.pinit.service.Oauth2ProviderMapper;
 import me.gg.pinit.service.Oauth2Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
+import java.util.Collections;
 
+@Slf4j
 @RestController
 @Tag(name = "소셜 로그인", description = "외부 OAuth2 공급자(네이버) 로그인 흐름")
 public class Oauth2Controller {
     private final JwtTokenProvider jwtTokenProvider;
     private final Oauth2Service oauth2Service;
     private final Oauth2ProviderMapper oauth2ProviderMapper;
+    private final TokenCookieFactory tokenCookieFactory;
+    private final String oauthCallbackBaseUrl;
 
-    public Oauth2Controller(JwtTokenProvider jwtTokenProvider, Oauth2Service oauth2Service, Oauth2ProviderMapper oauth2ProviderMapper) {
+    public Oauth2Controller(JwtTokenProvider jwtTokenProvider,
+                            Oauth2Service oauth2Service,
+                            Oauth2ProviderMapper oauth2ProviderMapper,
+                            TokenCookieFactory tokenCookieFactory,
+                            @Value("${app.frontend-base-url}") String oauthCallbackBaseUrl) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.oauth2Service = oauth2Service;
         this.oauth2ProviderMapper = oauth2ProviderMapper;
+        this.tokenCookieFactory = tokenCookieFactory;
+        this.oauthCallbackBaseUrl = oauthCallbackBaseUrl;
     }
 
     @GetMapping("/login/oauth2/authorize/{provider}")
@@ -92,36 +103,15 @@ public class Oauth2Controller {
             @ApiResponse(responseCode = "500", description = "state 검증 실패, 토큰 교환 실패 등 서버 오류")
     })
     public ResponseEntity<LoginResponse> socialLogin(@PathVariable String provider, @ModelAttribute SocialLoginResult socialLoginResult, HttpServletRequest request) {
-
         if (socialLoginResult.getError() != null) {
-            URI errorUri = URI.create("https://pinit.go-gradually.me/login?error=social");
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(errorUri)
-                    .build();
+            return ResponseEntity.badRequest().build();
         }
-
         HttpSession session = request.getSession(false);
         String sessionId = session != null ? session.getId() : null;
-
-        Member member = oauth2Service.login(provider, sessionId,
-                socialLoginResult.getCode(), socialLoginResult.getState());
-
+        Member member = oauth2Service.login(provider, sessionId, socialLoginResult.getCode(), socialLoginResult.getState());
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
-        ResponseCookie refreshCookie = getRefreshTokenCookie(refreshToken);
-
-        URI redirectUri = URI.create("https://pinit.go-gradually.me/");
-
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .location(redirectUri)
-                .build();
-    }
-
-    private ResponseCookie getRefreshTokenCookie(String refreshToken) {
-        return ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true)
-                .path("/")
-                .build();
+        String accessToken = jwtTokenProvider.createAccessToken(member.getId(), Collections.emptyList());
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, tokenCookieFactory.refreshTokenCookie(refreshToken).toString()).body(new LoginResponse(accessToken));
     }
 
     private OauthLoginSetting buildOauthLoginSetting(String state, String provider, HttpServletRequest request) {
@@ -136,9 +126,12 @@ public class Oauth2Controller {
 
     private String resolveRedirectUri(Oauth2Provider provider, String providerString, HttpServletRequest request) {
         String redirectUri = provider.getRedirectUri();
-        return redirectUri
-                .replace("{baseUrl}", getBaseUrl(request))
+        String baseUrl = StringUtils.hasText(oauthCallbackBaseUrl) ? oauthCallbackBaseUrl : getBaseUrl(request);
+        String replace = redirectUri
+                .replace("{baseUrl}", baseUrl)
                 .replace("{registrationId}", providerString);
+        log.info("Resolved redirect URI: {}", replace);
+        return replace;
     }
 
     private String getBaseUrl(HttpServletRequest request) {

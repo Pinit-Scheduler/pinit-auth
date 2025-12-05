@@ -14,9 +14,9 @@ import me.gg.pinit.controller.dto.LoginResponse;
 import me.gg.pinit.controller.dto.SignupRequest;
 import me.gg.pinit.domain.member.Member;
 import me.gg.pinit.infra.JwtTokenProvider;
+import me.gg.pinit.infra.config.TokenCookieFactory;
 import me.gg.pinit.service.MemberService;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,10 +31,12 @@ import java.util.Collections;
 public class MemberController {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenCookieFactory tokenCookieFactory;
 
-    public MemberController(MemberService memberService, JwtTokenProvider jwtTokenProvider) {
+    public MemberController(MemberService memberService, JwtTokenProvider jwtTokenProvider, TokenCookieFactory tokenCookieFactory) {
         this.memberService = memberService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.tokenCookieFactory = tokenCookieFactory;
     }
 
     @PostMapping("/login")
@@ -53,7 +55,7 @@ public class MemberController {
         String accessToken = jwtTokenProvider.createAccessToken(member.getId(), Collections.emptyList());
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, getRefreshTokenCookie(refreshToken).toString())
+                .header(HttpHeaders.SET_COOKIE, tokenCookieFactory.refreshTokenCookie(refreshToken).toString())
                 .body(new LoginResponse(accessToken));
     }
 
@@ -105,7 +107,7 @@ public class MemberController {
         String newRefreshToken = jwtTokenProvider.createRefreshToken(memberId);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, getRefreshTokenCookie(newRefreshToken).toString())
+                .header(HttpHeaders.SET_COOKIE, tokenCookieFactory.refreshTokenCookie(newRefreshToken).toString())
                 .body(new LoginResponse(newAccessToken));
     }
 
@@ -119,12 +121,5 @@ public class MemberController {
     )
     public ResponseEntity<Void> checkLogin() {
         return ResponseEntity.ok().build();
-    }
-
-    private ResponseCookie getRefreshTokenCookie(String refreshToken) {
-        return ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true)
-                .path("/")
-                .build();
     }
 }
