@@ -46,6 +46,7 @@ public class NaverOauth2Provider implements Oauth2Provider {
                 .compute();
     }
 
+    @Override
     public Profile getProfile(Oauth2Token accessToken) {
         if (!accessToken.getRole().equals(Oauth2Token.Role.ACCESS_TOKEN))
             throw new IllegalArgumentException("AccessToken이 아닙니다.");
