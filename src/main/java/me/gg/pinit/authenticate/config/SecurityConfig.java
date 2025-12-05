@@ -1,9 +1,9 @@
 package me.gg.pinit.authenticate.config;
 
-import me.gg.pinit.adaptor.JwtTokenProvider;
-import me.gg.pinit.adaptor.RsaKeyProvider;
 import me.gg.pinit.authenticate.filter.JwtAuthenticationFilter;
 import me.gg.pinit.authenticate.provider.JwtAuthenticationProvider;
+import me.gg.pinit.infra.JwtTokenProvider;
+import me.gg.pinit.infra.RsaKeyProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
