@@ -2,11 +2,13 @@ package me.gg.pinit.infra.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import me.gg.pinit.domain.oidc.OpenIdCommand;
 import me.gg.pinit.domain.oidc.OpenIdPublishCommand;
 import me.gg.pinit.domain.oidc.OpenIdRefreshCommand;
 import me.gg.pinit.domain.oidc.OpenIdRevokeCommand;
 
+@Slf4j
 @Getter
 @Setter
 public class OpenIdTokenRequest {
@@ -36,5 +38,19 @@ public class OpenIdTokenRequest {
             request.setService_provider(service_provider);
         }
         return request;
+    }
+
+    @Override
+    public String toString() {
+        return "OpenIdTokenRequest{" +
+                "grant_type='" + grant_type + '\'' +
+                ", client_id='" + client_id + '\'' +
+                ", client_secret='" + client_secret + '\'' +
+                ", code='" + code + '\'' +
+                ", state='" + state + '\'' +
+                ", refresh_token='" + refresh_token + '\'' +
+                ", access_token='" + access_token + '\'' +
+                ", service_provider='" + service_provider + '\'' +
+                '}';
     }
 }

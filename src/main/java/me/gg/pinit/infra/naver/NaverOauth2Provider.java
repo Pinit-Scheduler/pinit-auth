@@ -10,6 +10,8 @@ import me.gg.pinit.infra.dto.OpenIdTokenRequest;
 import me.gg.pinit.infra.dto.OpenIdTokenResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
 import java.net.URI;
@@ -29,10 +31,10 @@ public class NaverOauth2Provider implements Oauth2Provider {
 
     public NaverOauth2Provider(NaverRegistrationProperties naverRegistrationProperties) {
         loginClient = RestClient.builder()
-                .baseUrl(NAVER_ID_URL).defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .baseUrl(NAVER_ID_URL)
                 .build();
         profileClient = RestClient.builder()
-                .baseUrl(NAVER_APP_URL).defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .baseUrl(NAVER_APP_URL)
                 .build();
         this.naverRegistrationProperties = naverRegistrationProperties;
     }
@@ -54,16 +56,33 @@ public class NaverOauth2Provider implements Oauth2Provider {
 
     @Override
     public List<Oauth2Token> grantToken(OpenIdCommand command) {
+        OpenIdTokenRequest request = OpenIdTokenRequest.from(
+                command,
+                naverRegistrationProperties.getClientId(),
+                naverRegistrationProperties.getClientSecret(),
+                naverRegistrationProperties.getProvider());
+        MultiValueMap<String, String> formData = getMultiValueParams(request);
+
         return Objects.requireNonNull(loginClient.post()
                         .uri(OAUTH_2_0_TOKEN)
-                        .body(OpenIdTokenRequest.from(
-                                command,
-                                naverRegistrationProperties.getClientId(),
-                                naverRegistrationProperties.getClientSecret(),
-                                naverRegistrationProperties.getProvider()))
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .body(formData)
                         .retrieve()
                         .body(OpenIdTokenResponse.class))
                 .compute();
+    }
+
+    private MultiValueMap<String, String> getMultiValueParams(OpenIdTokenRequest request) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("grant_type", request.getGrant_type());
+        formData.add("client_id", request.getClient_id());
+        formData.add("client_secret", request.getClient_secret());
+        if (request.getCode() != null) formData.add("code", request.getCode());
+        if (request.getState() != null) formData.add("state", request.getState());
+        if (request.getRefresh_token() != null) formData.add("refresh_token", request.getRefresh_token());
+        if (request.getAccess_token() != null) formData.add("access_token", request.getAccess_token());
+        if (request.getService_provider() != null) formData.add("service_provider", request.getService_provider());
+        return formData;
     }
 
     @Override
