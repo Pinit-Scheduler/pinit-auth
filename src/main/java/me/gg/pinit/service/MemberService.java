@@ -16,9 +16,7 @@ public class MemberService {
     }
 
     public Member login(String username, String password) {
-        Member member = memberRepository.findAll().stream()
-                .filter(m -> m.getUsername().equals(username))
-                .findFirst()
+        Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다."));
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
@@ -29,6 +27,9 @@ public class MemberService {
     }
 
     public Member signup(String username, String password) {
+        if (memberRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
+        }
         Member member = new Member(username, passwordEncoder.encode(password));
         return memberRepository.save(member);
     }

@@ -16,6 +16,11 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 public class JwtTokenProvider {
+    private static final String CLAIM_ROLES = "roles";
+    private static final String CLAIM_TYPE = "type";
+    private static final String TYPE_ACCESS = "access";
+    private static final String TYPE_REFRESH = "refresh";
+
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
     private final String issuer;
@@ -46,7 +51,8 @@ public class JwtTokenProvider {
                 .issuer(issuer)
                 .issuedAt(now)
                 .expiration(expiry)
-                .claim("roles", roles)
+                .claim(CLAIM_ROLES, roles)
+                .claim(CLAIM_TYPE, TYPE_ACCESS)
                 .signWith(privateKey, Jwts.SIG.RS256)
                 .compact();
     }
@@ -63,7 +69,7 @@ public class JwtTokenProvider {
                 .issuer(issuer)
                 .issuedAt(now)
                 .expiration(expiry)
-                .claim("type", "refresh")
+                .claim(CLAIM_TYPE, TYPE_REFRESH)
                 .signWith(privateKey, Jwts.SIG.RS256)
                 .compact();
     }
@@ -80,9 +86,21 @@ public class JwtTokenProvider {
                 .getPayload();
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateAccessToken(String token) {
+        return validateTokenOfType(token, TYPE_ACCESS);
+    }
+
+    public boolean validateRefreshToken(String token) {
+        return validateTokenOfType(token, TYPE_REFRESH);
+    }
+
+    private boolean validateTokenOfType(String token, String expectedType) {
         try {
             Claims claims = parse(token);
+            String tokenType = claims.get(CLAIM_TYPE, String.class);
+            if (!expectedType.equals(tokenType)) {
+                return false;
+            }
             return !claims.getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
@@ -95,7 +113,7 @@ public class JwtTokenProvider {
 
     public Collection<? extends GrantedAuthority> getAuthorities(String token) {
         Claims claims = parse(token);
-        String roles = claims.get("roles", String.class);
+        String roles = claims.get(CLAIM_ROLES, String.class);
         if (roles == null || roles.isEmpty()) {
             return Collections.emptyList();
         }

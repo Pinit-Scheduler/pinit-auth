@@ -76,7 +76,7 @@ public class MemberController {
     @PostMapping("/refresh")
     @Operation(
             summary = "액세스 토큰 재발급",
-            description = "refresh_token 쿠키를 검증해 새로운 access/refresh token을 발급합니다.",
+            description = "refresh_token 쿠키에 담긴 리프레시 토큰만 검증하여 새로운 access/refresh token을 발급합니다. 액세스 토큰이나 다른 값이 들어있을 경우 401을 반환합니다.",
             parameters = {
                     @Parameter(name = "refresh_token", in = ParameterIn.COOKIE, description = "리프레시 토큰", required = true)
             }
@@ -96,7 +96,7 @@ public class MemberController {
                 .map(Cookie::getValue)
                 .orElse(null);
 
-        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
+        if (refreshToken == null || !jwtTokenProvider.validateRefreshToken(refreshToken)) {
             return ResponseEntity.status(401).build();
         }
 

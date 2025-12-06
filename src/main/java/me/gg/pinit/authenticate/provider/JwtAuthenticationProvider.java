@@ -24,7 +24,7 @@ public class JwtAuthenticationProvider  implements AuthenticationProvider {
         }
 
         String token = (String) authentication.getCredentials();
-        if(!jwtTokenProvider.validateToken(token)) {
+        if (!jwtTokenProvider.validateAccessToken(token)) {
             throw new BadCredentialsException("Invalid token");
         }
 
