@@ -69,7 +69,7 @@ public class MemberController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public ResponseEntity<Void> signup(@RequestBody SignupRequest signupRequest) {
-        memberService.signup(signupRequest.getUsername(), signupRequest.getPassword());
+        memberService.signup(signupRequest.getUsername(), signupRequest.getPassword(), signupRequest.getNickname());
         return ResponseEntity.ok().build();
     }
 

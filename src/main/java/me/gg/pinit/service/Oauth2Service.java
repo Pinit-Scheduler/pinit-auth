@@ -56,13 +56,13 @@ public class Oauth2Service {
         OauthAccountId oauthAccountId = new OauthAccountId(oauth2Provider.getAuthorizationUrl().toString(), profile.getId());
 
         OauthAccount oauthAccount = oauthAccountRepository.findById(oauthAccountId)
-                .orElseGet(() -> signup(oauthAccountId));
+                .orElseGet(() -> signup(oauthAccountId, profile));
 
         return oauthAccount.getMember();
     }
 
-    private OauthAccount signup(OauthAccountId oauthAccountId) {
-        Member member = memberService.signup(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    private OauthAccount signup(OauthAccountId oauthAccountId, Profile profile) {
+        Member member = memberService.signup(UUID.randomUUID().toString(), UUID.randomUUID().toString(), profile.getNickname());
         member.setSocialLogin(true);
         OauthAccount oauthAccount = new OauthAccount(oauthAccountId, member);
 

@@ -26,7 +26,7 @@ public class MemberService {
         return member;
     }
 
-    public Member signup(String username, String password) {
+    public Member signup(String username, String password, String nickname) {
         if (memberRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
         }
