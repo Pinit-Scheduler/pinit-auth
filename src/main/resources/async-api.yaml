@@ -1,0 +1,60 @@
+asyncapi: 3.0.0
+info:
+  title: Pinit auth events over RabbitMQ
+  version: '1.0.0'
+  description: 핀잇의 auth 서버가 발행/구독 하는 이벤트 정리
+
+servers:
+  rabbitmq:
+    host: Rabbitmq:5672
+    protocol: amqp
+    protocolVersion: '0-9-1'
+
+defaultContentType: application/json
+
+channels:
+  member.created:
+    address: member.created
+    messages:
+      memberCreated:
+        $ref: '#/components/messages/MemberCreated'
+    bindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: member-exchange
+          type: direct
+          durable: true
+          autoDelete: false
+
+operations:
+  publishMemberCreated: # 발행하는 방법의 정의, 여기서 발행을 처리함을 명시
+    action: send
+    channel:
+      $ref: '#/channels/member.created'
+    summary: 회원 생성 이벤트 발행
+    messages:
+      - $ref: '#/channels/member.created/messages/memberCreated'
+
+  subscribeMemberCreated: # 구독하는 방법의 정의, 여기서 구독을 처리함을 명시
+    action: receive
+    channel:
+      $ref: '#/channels/member.created'
+    summary: 회원 생성 이벤트 구독
+    messages:
+      - $ref: '#/channels/member.created/messages/memberCreated'
+
+components:
+  messages:
+    MemberCreated:
+      name: MemberCreated
+      title: Member created event
+      payload:
+        type: object
+        properties:
+          memberId:
+            type: integer
+            format: int64
+          nickname:
+            type: string
+        required: [ memberId, nickname ]
