@@ -1,5 +1,7 @@
 package me.gg.pinit.service;
 
+import me.gg.pinit.domain.event.DomainEventPublisher;
+import me.gg.pinit.domain.event.MemberCreatedEvent;
 import me.gg.pinit.domain.member.Member;
 import me.gg.pinit.domain.member.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,10 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DomainEventPublisher domainEventPublisher;
 
-    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder, DomainEventPublisher domainEventPublisher) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+        this.domainEventPublisher = domainEventPublisher;
     }
 
     public Member login(String username, String password) {
@@ -33,6 +37,8 @@ public class MemberService {
             throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
         }
         Member member = new Member(username, passwordEncoder.encode(password));
+
+        domainEventPublisher.publish(new MemberCreatedEvent(member.getId(), nickname));
         return memberRepository.save(member);
     }
 }
