@@ -38,7 +38,8 @@ public class MemberService {
         }
         Member member = new Member(username, passwordEncoder.encode(password));
 
+        memberRepository.save(member);
         domainEventPublisher.publish(new MemberCreatedEvent(member.getId(), nickname));
-        return memberRepository.save(member);
+        return member;
     }
 }
