@@ -41,3 +41,6 @@ out/
 keys/
 
 src/main/resources/application*.yml
+
+### async api documentation
+src/main/resources/static/async-api/**
