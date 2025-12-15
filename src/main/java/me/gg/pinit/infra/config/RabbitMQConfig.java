@@ -1,6 +1,6 @@
 package me.gg.pinit.infra.config;
 
-import me.gg.pinit.infra.events.MemberMessaging;
+import me.gg.pinit.infra.events.member.MemberMessaging;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
