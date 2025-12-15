@@ -1,7 +1,27 @@
 package me.gg.pinit.infra.events.dto;
 
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import lombok.Getter;
+import me.gg.pinit.infra.events.Outbox;
+
 import java.time.LocalDateTime;
 
-public record MemberCreatedPayload(Long memberId, String nickname, LocalDateTime occurredAt) {
+@Getter
+@Entity
+@DiscriminatorValue("MemberCreatedPayload")
+public class MemberCreatedPayload extends Outbox {
+    Long memberId;
+    String nickname;
+    LocalDateTime occurredAt;
+
+    protected MemberCreatedPayload() {
+    }
+
+    public MemberCreatedPayload(Long memberId, String nickname, LocalDateTime occurredAt) {
+        this.memberId = memberId;
+        this.nickname = nickname;
+        this.occurredAt = occurredAt;
+    }
 }
