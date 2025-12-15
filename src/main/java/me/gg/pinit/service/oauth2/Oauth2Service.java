@@ -1,4 +1,4 @@
-package me.gg.pinit.service;
+package me.gg.pinit.service.oauth2;
 
 import lombok.extern.slf4j.Slf4j;
 import me.gg.pinit.domain.member.Member;
@@ -9,6 +9,7 @@ import me.gg.pinit.domain.oidc.Oauth2Provider;
 import me.gg.pinit.domain.oidc.Oauth2Token;
 import me.gg.pinit.domain.oidc.OpenIdPublishCommand;
 import me.gg.pinit.domain.oidc.Profile;
+import me.gg.pinit.service.member.MemberService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

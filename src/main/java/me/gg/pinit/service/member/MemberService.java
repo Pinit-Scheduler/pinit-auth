@@ -1,4 +1,4 @@
-package me.gg.pinit.service;
+package me.gg.pinit.service.member;
 
 import me.gg.pinit.domain.event.DomainEventPublisher;
 import me.gg.pinit.domain.event.MemberCreatedEvent;

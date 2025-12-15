@@ -15,7 +15,7 @@ import me.gg.pinit.controller.dto.SignupRequest;
 import me.gg.pinit.domain.member.Member;
 import me.gg.pinit.infra.jwt.JwtTokenProvider;
 import me.gg.pinit.infra.jwt.TokenCookieFactory;
-import me.gg.pinit.service.MemberService;
+import me.gg.pinit.service.member.MemberService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
