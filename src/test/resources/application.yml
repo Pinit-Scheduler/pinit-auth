@@ -18,5 +18,5 @@ app:
 path:
   key:
     jwt:
-      public: /etc/pinit/keys/jwt-public-key.pem
-      private: /etc/pinit/keys/jwt-private-key.pem
+      public: ${HOME}/pinit/keys/jwt-public-key.pem
+      private: ${HOME}/pinit/keys/jwt-private-key.pem
