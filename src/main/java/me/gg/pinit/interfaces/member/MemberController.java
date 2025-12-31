@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Arrays;
 import java.util.Collections;
 
+@Deprecated
 @RestController
 @Tag(name = "회원/인증", description = "아이디/비밀번호 로그인 및 토큰 관리")
 public class MemberController {

@@ -30,6 +30,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
 
+@Deprecated
 @Slf4j
 @RestController
 @Tag(name = "소셜 로그인", description = "외부 OAuth2 공급자(네이버) 로그인 흐름")
